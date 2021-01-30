@@ -1,79 +1,39 @@
-// // Setup basic express server
-// const express = require('express');
-// const app = express();
-// const path = require('path');
-// const server = require('http').createServer(app);
-// const io = require('socket.io')(server);
-// const port = process.env.PORT || 3000;
+const crypto = require('crypto');
+const express = require('express');
+const { createServer } = require('http');
+const WebSocket = require('ws');
 
-// server.listen(port, () => {
-//   console.log('Server listening at port %d', port);
-// });
+const app = express();
 
-// // Routing
-// app.use(express.static(path.join(__dirname, 'public')));
+const server = createServer(app);
+const wss = new WebSocket.Server({ server });
 
-// // Chatroom
+wss.on('connection', function(ws) {
+  console.log("client joined.");
 
+  // send "hello world" interval
+  const textInterval = setInterval(() => ws.send("hello world!"), 100);
 
-// let numUsers = 0;
+  // send random bytes interval
+  const binaryInterval = setInterval(() => ws.send(crypto.randomBytes(8).buffer), 110);
 
-// io.on('connection', (socket) => {
-//   let addedUser = false;
-//   console.log("new connection")
+  ws.on('message', function(data) {
+    if (typeof(data) === "string") {
+      // client sent a string
+      console.log("string received from client -> '" + data + "'");
 
-//   // when the client emits 'new message', this listens and executes
-//   socket.on('new message', (data) => {
-//     // we tell the client to execute 'new message'
-//     socket.broadcast.emit('new message', {
-//       username: socket.username,
-//       message: data
-//     });
-//   });
+    } else {
+      console.log("binary received from client -> " + Array.from(data).join(", ") + "");
+    }
+  });
 
-//   // when the client emits 'add user', this listens and executes
-//   socket.on('add user', (username) => {
-//     if (addedUser) return;
+  ws.on('close', function() {
+    console.log("client left.");
+    clearInterval(textInterval);
+    clearInterval(binaryInterval);
+  });
+});
 
-//     // we store the username in the socket session for this client
-//     socket.username = username;
-//     ++numUsers;
-//     addedUser = true;
-//     socket.emit('login', {
-//       numUsers: numUsers
-//     });
-//     // echo globally (all clients) that a person has connected
-//     socket.broadcast.emit('user joined', {
-//       username: socket.username,
-//       numUsers: numUsers
-//     });
-//     console.log("New username: " + username)
-//   });
-
-//   // when the client emits 'typing', we broadcast it to others
-//   socket.on('typing', () => {
-//     socket.broadcast.emit('typing', {
-//       username: socket.username
-//     });
-//   });
-
-//   // when the client emits 'stop typing', we broadcast it to others
-//   socket.on('stop typing', () => {
-//     socket.broadcast.emit('stop typing', {
-//       username: socket.username
-//     });
-//   });
-
-//   // when the user disconnects.. perform this
-//   socket.on('disconnect', () => {
-//     if (addedUser) {
-//       --numUsers;
-
-//       // echo globally that this client has left
-//       socket.broadcast.emit('user left', {
-//         username: socket.username,
-//         numUsers: numUsers
-//       });
-//     }
-//   });
-// });
+server.listen(8080, function() {
+  console.log('Listening on http://localhost:8080');
+});

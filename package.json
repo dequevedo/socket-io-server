@@ -1,15 +1,16 @@
 {
-  "name": "socket.io-chat",
-  "version": "0.0.0",
-  "description": "A simple chat client using socket.io",
-  "main": "server.js",
-  "author": "Daniel",
-  "license": "MIT",
+  "name": "nodeserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "socket.io": "^3.0.0"
-  },
-  "scripts": {
-    "start": "node server.js"
+    "ws": "^7.1.2"
   }
 }
