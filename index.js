@@ -41,7 +41,7 @@ wss.on('connection', function(ws) {
 });
 
 wss.broadcast = function broadcast(msg) {
-  console.log(msg);
+  // console.log(msg);
   wss.clients.forEach(function each(client) {
       client.send(msg);
    });
