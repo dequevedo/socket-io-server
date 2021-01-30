@@ -20,7 +20,7 @@ wss.on('connection', function(ws) {
   ws.on('message', function(data) {
     if (typeof(data) === "string") {
       // client sent a string
-      console.log("string received from client -> '" + data + "'");
+      // console.log("string received from client -> '" + data + "'");
 
       // Send message only to 1 client
       // ws.send("Server: " + data);
@@ -29,7 +29,7 @@ wss.on('connection', function(ws) {
       wss.broadcast(data);
 
     } else {
-      console.log("binary received from client -> " + Array.from(data).join(", ") + "");
+      // console.log("binary received from client -> " + Array.from(data).join(", ") + "");
     }
   });
 
