@@ -21,7 +21,12 @@ wss.on('connection', function(ws) {
     if (typeof(data) === "string") {
       // client sent a string
       console.log("string received from client -> '" + data + "'");
-      ws.send("Server: " + data);
+
+      // Send message only to 1 client
+      // ws.send("Server: " + data);
+
+      // Send message to all clients
+      wss.broadcast(data);
 
     } else {
       console.log("binary received from client -> " + Array.from(data).join(", ") + "");
@@ -34,6 +39,13 @@ wss.on('connection', function(ws) {
     clearInterval(binaryInterval);
   });
 });
+
+wss.broadcast = function broadcast(msg) {
+  console.log(msg);
+  wss.clients.forEach(function each(client) {
+      client.send(msg);
+   });
+};
 
 server.listen(process.env.PORT || 8080, function() {
   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
