@@ -38,7 +38,11 @@ wss.on('connection', function(ws,req) {
 
             console.log(Users)
             ws.send(JSON.stringify({type:'success',success : true}));
+            
             //eviar uma mensagems para os outros clientes
+            wss.broadcast(JSON.stringify({type:'set_users', users : Users }))
+
+
           }else{
 
             ws.send(JSON.stringify({type:'success',success : false}));
@@ -77,6 +81,7 @@ wss.on('connection', function(ws,req) {
     }else{
       
       console.log("Message type not faund")
+
       console.log(data)
 
     }
@@ -139,6 +144,9 @@ function gameStart(){
   GameState['Users'] = Users
   GameState[roons_number] = get_roons_number()
 }
+
+
+
 
 
 function get_others_users_position(socket_id){
