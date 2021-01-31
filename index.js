@@ -32,13 +32,11 @@ wss.on('connection', function(ws,req) {
 
           console.log("socket_id : ",data.socket_id )
           if(!Users[data.socket_id]){
-            console.log(Users[data.socket_id])
-
             Users[data.socket_id] = data.user
 
             console.log(Users)
             ws.send(JSON.stringify({type:'success',success : true}));
-
+            //eviar uma mensagems para os outros clientes
           }else{
 
             ws.send(JSON.stringify({type:'success',success : false}));
@@ -85,6 +83,36 @@ wss.broadcast = function broadcast(msg) {
 server.listen(process.env.PORT || 8080, function() {
   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
 });
+
+
+function set_assasin(){
+  let assasin = false
+  for (let index = 0; index < Object.keys(Users).length; index++) {
+    if(index == Object.keys(Users).length-1 && !assasin && Object.keys(Users)[index].assasin){
+      Object.keys(Users)[index].assasin = false
+      Object.keys(Users)[0].assasin = true
+      assasin = true
+
+    }else if(!assasin &&  Object.keys(Users)[index].assasin){
+      Object.keys(Users)[index].assasin = false
+      Object.keys(Users)[index+1].assasin = true
+      assasin = true
+    }
+    
+  }
+
+  if(!assasin){
+    Object.keys(Users)[0].assasin = true
+  }
+
+}
+
+
+function get_roons_number(){
+
+}
+
+
 //------------------------------------------------------------------------------------------------------------
 
  // const textInterval = setInterval(() => ws.send("hello world!"), 100);
