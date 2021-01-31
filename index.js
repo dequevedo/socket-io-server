@@ -7,14 +7,41 @@ const app = express();
 
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
-const Users = {}
+let Users = {}
 
 const GameState = {}
 
+
+
+
+
+
 wss.on('connection', function(ws,req) {
-  console.log("client joined.");
 
 
+  const textInterval = setInterval(function verifyloged(){
+
+    const auxUsers = {}
+    wss.clients.forEach(function each(client) {
+      
+      auxUsers[client.id] = Users[client.id]
+      
+      
+      console.log('Client.ID: ' + client.id);
+
+  });
+
+
+  for (const [key, value] of Object.entries(Users)) {
+    if(!auxUsers.hasOwnProperty(key)){
+      wss.broadcast(JSON.stringify({type:'desconect', socket_id: key}))
+    }
+  }
+
+  Users = auxUsers
+
+  }, 2000);
+ 
    //wss.broadcast(data);
 
 
@@ -31,12 +58,9 @@ wss.on('connection', function(ws,req) {
           console.log(data)
         },
         connection : function(ws,data){
-
-          console.log("socket_id : ",data.socket_id )
+          ws.id = data.socket_id
           if(!Users[data.socket_id]){
             Users[data.socket_id] = data.user
-
-            console.log(Users)
             ws.send(JSON.stringify({type:'success',success : true}));
             
             //eviar uma mensagems para os outros clientes
@@ -94,7 +118,7 @@ wss.on('connection', function(ws,req) {
   });
 
   ws.on('close', function() {
-    console.log("client left.");
+    console.log("client left");
 
   });
 });
@@ -146,7 +170,9 @@ function gameStart(){
 }
 
 
-
+wss.on('close', function close() {
+  clearInterval(textInterval);
+});
 
 
 function get_others_users_position(socket_id){
