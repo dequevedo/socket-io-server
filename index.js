@@ -54,18 +54,22 @@ wss.on('connection', function(ws,req) {
           ws.send(JSON.stringify({type:'get_game_state', GameState}));
 
         },
-        muvement : function(ws,data){
+        movement : function(ws,data){
 
           Users[data.socket_id].position = data.position
 
-          ws.send(JSON.stringify({type:'muvement', users_positions : get_others_users_position(data.socket_id)}));
+          ws.send(JSON.stringify({type:'movement', users_positions : get_others_users_position(data.socket_id)}));
+        },
 
 
+        ready: function(ws, data){
 
+          Users[data.socket_id].ready = data.ready
+
+          //eviar para todos os players 
+
+          wss.broadcast(JSON.stringify({type:'ready', data: data}))
         }
-
-
-
     }
 
     if(data.type){
