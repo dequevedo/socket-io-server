@@ -57,7 +57,7 @@ wss.on('connection', function(ws,req) {
         log : function(ws,data){
           console.log(data)
         },
-        jion : function(ws,data){
+        join : function(ws,data){
           ws.id = data.socket_id
           if(!Users[data.socket_id]){
             Users[data.socket_id] = data.user
@@ -81,7 +81,7 @@ wss.on('connection', function(ws,req) {
 
           ws.send(JSON.stringify({type:'get_game_state', GameState}));
 
-        },
+        }, 
         movement : function(ws,data){
 
           Users[data.socket_id].position = data.position
