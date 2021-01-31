@@ -25,8 +25,6 @@ wss.on('connection', function(ws,req) {
     wss.clients.forEach(function each(client) {
       
       auxUsers[client.id] = Users[client.id]
-      
-      
       console.log('Client.ID: ' + client.id);
 
   });
@@ -34,7 +32,7 @@ wss.on('connection', function(ws,req) {
 
   for (const [key, value] of Object.entries(Users)) {
     
-    if(!auxUsers.hasOwnProperty(key)&& key){
+    if(!auxUsers.hasOwnProperty(key)&& key!= undefined){
       console.log("disconnect id :",key)
       wss.broadcast(JSON.stringify({type:'disconnect', socket_id: key}))
     }
@@ -64,7 +62,6 @@ wss.on('connection', function(ws,req) {
           if(!Users[data.socket_id]){
             Users[data.socket_id] = data.user
             ws.send(JSON.stringify({type:'success',success : true}));
-            
             //eviar uma mensagems para os outros clientes
             wss.broadcast(JSON.stringify({type:'set_users', users : Users }))
 
@@ -178,12 +175,11 @@ wss.on('close', function close() {
 
 
 function get_others_users_position(socket_id){
-  const users_positions = {}
+  const users_positions = []
 
   for (const [key, value] of Object.entries(Users)) {
     if(key !== socket_id){
-
-      users_positions[key] = Users[key].position
+      users_positions.push({user_id : key , position : Users[key].position})
     }
   }
 
