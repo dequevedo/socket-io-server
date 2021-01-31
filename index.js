@@ -57,7 +57,7 @@ wss.on('connection', function(ws,req) {
         log : function(ws,data){
           console.log(data)
         },
-        connection : function(ws,data){
+        jion : function(ws,data){
           ws.id = data.socket_id
           if(!Users[data.socket_id]){
             Users[data.socket_id] = data.user
