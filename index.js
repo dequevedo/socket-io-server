@@ -33,8 +33,10 @@ wss.on('connection', function(ws,req) {
 
 
   for (const [key, value] of Object.entries(Users)) {
-    if(!auxUsers.hasOwnProperty(key)){
-      wss.broadcast(JSON.stringify({type:'desconect', socket_id: key}))
+    
+    if(!auxUsers.hasOwnProperty(key)&& key){
+      console.log("desconnect id :",key)
+      wss.broadcast(JSON.stringify({type:'disconnect', socket_id: key}))
     }
   }
 
