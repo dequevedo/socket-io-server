@@ -9,6 +9,8 @@ const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 const Users = {}
 
+const GameState = {}
+
 wss.on('connection', function(ws,req) {
   console.log("client joined.");
 
@@ -44,7 +46,21 @@ wss.on('connection', function(ws,req) {
           }
         },
         get_users: function(ws,data){
-           ws.send(JSON.stringify({type:'get_users', sUsers}));
+           ws.send(JSON.stringify({type:'get_users', Users}));
+
+        },
+        get_game_state :function(ws,data) {
+
+          ws.send(JSON.stringify({type:'get_game_state', GameState}));
+
+        },
+        muvement : function(ws,data){
+
+          Users[data.socket_id].position = data.position
+
+          ws.send(JSON.stringify({type:'muvement', users_positions : get_others_users_position(data.socket_id)}));
+
+
 
         }
 
@@ -109,7 +125,29 @@ function set_assasin(){
 
 
 function get_roons_number(){
+    return  Object.keys(Users).length * 4
+}
 
+
+function gameStart(){
+
+  set_assasin()
+  GameState['Users'] = Users
+  GameState[roons_number] = get_roons_number()
+}
+
+
+function get_others_users_position(socket_id){
+  const users_positions = {}
+
+  for (const [key, value] of Object.entries(Users)) {
+    if(key !== socket_id){
+
+      users_positions[key] = Users[key].position
+    }
+  }
+
+  return users_positions
 }
 
 
