@@ -63,7 +63,15 @@ wss.on('connection', function(ws,req) {
             Users[data.socket_id] = data.user
             ws.send(JSON.stringify({type:'success',success : true}));
             //eviar uma mensagems para os outros clientes
-            wss.broadcast(JSON.stringify({type:'set_users', users : Users }))
+            let users = []
+            for (const [key, value] of Object.entries(Users)) {
+              
+                users.push(Users[key])
+              
+            }
+
+
+            wss.broadcast(JSON.stringify({type:'set_users', users  }))
 
 
           }else{
