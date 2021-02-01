@@ -11,11 +11,6 @@ let Users = {}
 
 const GameState = {}
 
-
-
-
-
-
 wss.on('connection', function(ws,req) {
 
 
@@ -36,13 +31,15 @@ wss.on('connection', function(ws,req) {
 
   Users = auxUsers
 
-  }, 500);
+  }, 2000);
  
    //wss.broadcast(data);
 
 
 
   ws.on('message', function(data) {
+
+    dataUnchanged = data
 
     if (typeof(data) === "string") {
 
@@ -54,26 +51,22 @@ wss.on('connection', function(ws,req) {
           console.log(data)
         },
         join : function(ws,data){
+          console.log("Join Received: " + dataUnchanged)
           ws.id = data.socket_id
           if(!Users[data.socket_id]){
             Users[data.socket_id] = data.user
             ws.send(JSON.stringify({type:'success',success : true}));
-            //eviar uma mensagems para os outros clientes
+            
+            //Enviar broadcast para os demais clientes
             let users = []
             for (const [key, value] of Object.entries(Users)) {
-              
                 users.push(Users[key])
-              
             }
-
 
             wss.broadcast(JSON.stringify({type:'set_users', users  }))
 
-
           }else{
-
-            ws.send(JSON.stringify({type:'success',success : false}));
-          
+            ws.send(JSON.stringify({type:'success', success : false}));
           }
         },
         get_users: function(ws,data){
@@ -86,10 +79,13 @@ wss.on('connection', function(ws,req) {
 
         }, 
         movement : function(ws,data){
+          console.log("Movement Received: " + dataUnchanged)
 
           Users[data.socket_id].position = data.position
 
-          ws.send(JSON.stringify({type:'movement', users_positions : get_others_users_position(data.socket_id)}));
+          finalMessage = JSON.stringify({type:'movement', users_positions : get_others_users_position(data.socket_id)})
+
+          ws.send(finalMessage);
         },
 
 
@@ -107,7 +103,7 @@ wss.on('connection', function(ws,req) {
       type[data.type](ws,data.data)
     }else{
       
-      console.log("Message type not faund")
+      console.log("Message type not found")
 
       console.log(data)
 
@@ -182,7 +178,7 @@ function get_others_users_position(socket_id){
   const users_positions = []
 
   for (const [key, value] of Object.entries(Users)) {
-    if(key !== socket_id && Users.hasOwnProperty(key)){
+  if(key != undefined && key != "undefined" && key !== socket_id && Users.hasOwnProperty(key)){ // TODO remover os undefined
       users_positions.push({user_id : key , position : Users[key].position})
     }
   }
