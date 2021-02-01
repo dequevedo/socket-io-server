@@ -79,7 +79,7 @@ wss.on('connection', function(ws,req) {
 
         }, 
         movement : function(ws,data){
-          console.log("Movement Received: " + dataUnchanged)
+          // console.log("Movement Received: " + dataUnchanged)
 
           Users[data.socket_id].position = data.position
 
